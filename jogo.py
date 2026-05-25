@@ -424,3 +424,58 @@ def draw_safe():
 
     hint = font_small.render("ESC para voltar ao quarto", True, (170, 160, 145))
     screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 32))
+
+# ---------------------------------------------------
+# TELA DO QUEBRA-CABECA
+# ---------------------------------------------------
+def draw_painting_puzzle():
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 220))
+    screen.blit(overlay, (0, 0))
+
+    panel = pygame.Rect(GRID_X - 25, 110, GRID_W + 50, GRID_H + 150)
+    pygame.draw.rect(screen, (18, 16, 20), panel, border_radius=18)
+    pygame.draw.rect(screen, GOLD, panel, 3, border_radius=18)
+
+    draw_text_center("Organize o quadro", font_big, GOLD, panel.centerx, panel.y + 34)
+    draw_text_center("Clique em duas partes para trocar", font_small, WHITE, panel.centerx, panel.y + 68)
+
+    for idx, rect in enumerate(painting_positions):
+        piece_idx = current_order[idx]
+        screen.blit(painting_piece_surfs[piece_idx], rect.topleft)
+
+        border = GOLD if painting_selected == idx else (120, 105, 80)
+        pygame.draw.rect(screen, border, rect, 3)
+
+        if painting_selected == idx:
+            pygame.draw.rect(screen, (255, 245, 180), rect.inflate(8, 8), 2)
+
+# ---------------------------------------------------
+# TELA DE VITÓRIA
+# ---------------------------------------------------
+def draw_victory():
+    screen.blit(background, (0, 0))
+
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 170))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(180, 80, 640, 500)
+
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=20)
+    pygame.draw.rect(screen, GOLD, box, 4, border_radius=20)
+
+    draw_text_center("Você achou a chave!", font_big, GOLD, box.centerx, box.y + 60)
+
+    cx = box.centerx
+    cy = box.centery - 20
+
+    pygame.draw.circle(screen, GOLD, (cx - 120, cy), 38, 8)
+    pygame.draw.rect(screen, GOLD, (cx - 80, cy - 10, 220, 20))
+    pygame.draw.rect(screen, GOLD, (cx + 90, cy + 10, 20, 40))
+    pygame.draw.rect(screen, GOLD, (cx + 130, cy + 10, 20, 25))
+    pygame.draw.line(screen, (255, 245, 180), (cx - 75, cy), (cx + 120, cy), 3)
+
+    pygame.draw.rect(screen, (35, 30, 24), next_button, border_radius=12)
+    pygame.draw.rect(screen, GOLD, next_button, 3, border_radius=12)
+    draw_text_center("PROXIMA FASE", font, GOLD, next_button.centerx, next_button.centery)
