@@ -290,7 +290,7 @@ safe_input = ""
 
 code = ""
 
-BED_TIME_LIMIT = 20.0
+BED_TIME_LIMIT = 25.0
 bed_timer_remaining = BED_TIME_LIMIT
 
 def generate_bed_puzzle():
@@ -345,7 +345,7 @@ def draw_intro_panel(title, subtitle):
 
 def draw_popup(title, text):
     overlay = pygame.Surface((W, H), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 180))
+    overlay.fill((0, 0, 0, 145))
     screen.blit(overlay, (0, 0))
 
     box = pygame.Rect(200, 150, 600, 360)
