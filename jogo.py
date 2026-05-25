@@ -291,3 +291,77 @@ def generate_bed_puzzle():
 
 
 generate_bed_puzzle()
+
+# ---------------------------------------------------
+# TEXT
+# ---------------------------------------------------
+def draw_text(text, font_obj, color, x, y):
+    img = font_obj.render(text, True, color)
+    screen.blit(img, (x, y))
+
+
+def draw_text_center(text, font_obj, color, centerx, centery):
+    img = font_obj.render(text, True, color)
+    screen.blit(img, (centerx - img.get_width() // 2, centery - img.get_height() // 2))
+
+# ---------------------------------------------------
+# RESET
+# ---------------------------------------------------
+def reset_game():
+    global game_state, glasses_done, diary_done, window_done, bed_done, safe_done, clock_done, painting_done
+    global popup, current_question, user_input, puzzle_active, safe_active, safe_input
+    global painting_selected, current_order, bed_timer_remaining
+
+    game_state = STATE_START
+    glasses_done = False
+    diary_done = False
+    window_done = False
+    bed_done = False
+    safe_done = False
+    clock_done = False
+    painting_done = False
+
+    popup = None
+
+    current_question = 0
+    user_input = ""
+    puzzle_active = False
+
+    safe_active = False
+    safe_input = ""
+
+    painting_selected = None
+    current_order = correct_order[:]
+    random.shuffle(current_order)
+    while current_order == correct_order:
+        random.shuffle(current_order)
+
+    bed_timer_remaining = BED_TIME_LIMIT
+    generate_bed_puzzle()
+    stop_alarm()
+
+# ---------------------------------------------------
+# POPUP
+# ---------------------------------------------------
+def draw_popup(title, text):
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(200, 150, 600, 360)
+
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=12)
+    pygame.draw.rect(screen, GOLD, box, 3, border_radius=12)
+
+    draw_text_center(title, font_big, GOLD, box.centerx, box.y + 60)
+
+    lines = text.split("\n")
+    yy = box.y + 135
+
+    for line in lines:
+        img = font.render(line, True, WHITE)
+        screen.blit(img, (box.centerx - img.get_width() // 2, yy))
+        yy += 40
+
+    hint = font_small.render("Clique para fechar", True, (180, 180, 180))
+    screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 45))
