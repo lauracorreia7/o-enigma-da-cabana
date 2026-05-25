@@ -55,3 +55,67 @@ background_poem = pygame.transform.scale(background_poem, (W, H))
 
 start_bg = pygame.image.load(str(START_PATH)).convert()
 start_bg = pygame.transform.scale(start_bg, (W, H))
+
+# ---------------------------------------------------
+# SOM DO ALARME
+# ---------------------------------------------------
+def load_first_sound(paths):
+    for p in paths:
+        if p.exists():
+            try:
+                return pygame.mixer.Sound(str(p))
+            except Exception:
+                pass
+    return None
+
+
+ALARM_SOUND = load_first_sound([
+    ASSET_DIR_SONS / "alarme.mp3",
+    ASSET_DIR_SONS / "alarme.wav",
+])
+
+alarm_channel = None
+alarm_on = False
+
+if ALARM_SOUND:
+    try:
+        ALARM_SOUND.set_volume(0.35)
+    except Exception:
+        pass
+
+
+def start_alarm():
+    global alarm_channel, alarm_on
+    alarm_on = True
+    if ALARM_SOUND and pygame.mixer.get_init():
+        try:
+            if alarm_channel:
+                alarm_channel.stop()
+            alarm_channel = ALARM_SOUND.play(-1)
+        except Exception:
+            alarm_channel = None
+
+
+def stop_alarm():
+    global alarm_channel, alarm_on
+    alarm_on = False
+    try:
+        if alarm_channel:
+            alarm_channel.stop()
+    except Exception:
+        pass
+    alarm_channel = None
+
+
+# ---------------------------------------------------
+# SOM DE FUNDO
+# ---------------------------------------------------
+BACKGROUND_SOUND = load_first_sound([ASSET_DIR_SONS / "tempestade.mp3"])
+background_channel = None
+
+if BACKGROUND_SOUND:
+    try:
+        BACKGROUND_SOUND.set_volume(0.18)
+        background_channel = BACKGROUND_SOUND.play(-1)
+    except Exception:
+        background_channel = None
