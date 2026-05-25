@@ -196,3 +196,46 @@ while current_order == correct_order:
     random.shuffle(current_order)
 
 painting_selected = None
+
+# ---------------------------------------------------
+# GAME STATE
+# ---------------------------------------------------
+STATE_START = "start"
+STATE_POEM = "poem"
+STATE_GAME = "game"
+STATE_PAINTING = "painting"
+STATE_VICTORY = "victory"
+STATE_LOSE = "lose"
+STATE_NEXT = "next"
+
+game_state = STATE_START
+
+glasses_done = False
+diary_done = False
+window_done = False
+bed_done = False
+safe_done = False
+clock_done = False
+painting_done = False
+
+popup = None
+
+# ---------------------------------------------------
+# BOTÕES
+# ---------------------------------------------------
+start_button = pygame.Rect(385, 520, 235, 70)
+next_button = pygame.Rect(350, 520, 300, 70)
+lose_button = pygame.Rect(350, 520, 300, 70)
+
+# ---------------------------------------------------
+# BOTÕES DOS ITENS
+# ---------------------------------------------------
+items = {
+    "glasses": {"rect": pygame.Rect(610, 340, 55, 30)},
+    "diary": {"rect": pygame.Rect(700, 320, 60, 40)},
+    "window": {"rect": pygame.Rect(400, 100, 220, 220)},
+    "bed": {"rect": pygame.Rect(100, 300, 250, 250)},
+    "safe": {"rect": pygame.Rect(830, 360, 140, 140)},
+    "clock": {"rect": pygame.Rect(375, 350, 60, 55)},
+    "painting": {"rect": pygame.Rect(130, 150, 80, 130)},
+}
