@@ -930,3 +930,278 @@ while running:
                         running = False
 
                 continue
+
+
+        # ---------------------------------------------------
+        # FASE 1
+        # ---------------------------------------------------
+
+        if game_state == STATE_START:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+                if start_button.collidepoint(event.pos):
+                    game_state = STATE_POEM
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    game_state = STATE_POEM
+
+            continue
+
+        if game_state == STATE_POEM:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                game_state = STATE_GAME
+                continue
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    game_state = STATE_GAME
+
+            continue
+
+        if game_state == STATE_PAINTING:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+                clicked = None
+
+                for i, rect in enumerate(painting_positions):
+
+                    if rect.collidepoint(event.pos):
+                        clicked = i
+                        break
+
+                if clicked is not None:
+
+                    if painting_selected is None:
+                        painting_selected = clicked
+
+                    else:
+
+                        current_order[painting_selected], current_order[clicked] = (
+                            current_order[clicked],
+                            current_order[painting_selected],
+                        )
+
+                        painting_selected = None
+
+                        if current_order == correct_order:
+
+                            painting_done = True
+                            painting_selected = None
+                            game_state = STATE_GAME
+
+                            start_alarm()
+
+                            popup = (
+                                "Quadro",
+                                "A pintura foi restaurada.\nO alarme começou a tocar!"
+                            )
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                painting_selected = None
+                game_state = STATE_GAME
+
+            continue
+
+        if game_state == STATE_VICTORY:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+                if next_button.collidepoint(event.pos):
+                    game_state = STATE_NEXT
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    game_state = STATE_NEXT
+
+            continue
+
+        # ---------------------------------------------------
+        # COMEÇA FASE 2
+        # ---------------------------------------------------
+
+        if game_state == STATE_NEXT:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+                phase2_started = True
+                state = STATE_INTRO_1
+
+            continue
+
+        if game_state == STATE_LOSE:
+
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+
+                if lose_button.collidepoint(event.pos):
+                    reset_game()
+
+            if event.type == pygame.KEYDOWN:
+
+                if event.key in (pygame.K_RETURN, pygame.K_SPACE):
+                    reset_game()
+
+            continue
+
+        # ---------------------------------------------------
+        # CLIQUES FASE 1
+        # ---------------------------------------------------
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            mx, my = event.pos
+
+            if popup:
+                popup = None
+                continue
+
+            if safe_active:
+
+                if event.button == 1:
+                    safe_active = False
+
+                continue
+
+            if not puzzle_active and not safe_active:
+
+                if items["glasses"]["rect"].collidepoint(mx, my):
+
+                    glasses_done = True
+
+                    popup = (
+                        "Óculos",
+                        "Agora eu consigo enxergar o que escrevo."
+                    )
+
+                elif items["diary"]["rect"].collidepoint(mx, my):
+
+                    if not glasses_done:
+
+                        popup = (
+                            "Diário",
+                            "Você não consegue ler sem os óculos."
+                        )
+
+                    else:
+
+                        diary_done = True
+
+                        popup = (
+                            "Diário",
+                            "Sexta-feira, 13 de setembro de 3029\n"
+                            "A poeira no ar estava terrível.\n"
+                            "Tive que deixar a janela fechada."
+                        )
+
+                elif items["window"]["rect"].collidepoint(mx, my):
+
+                    if not diary_done:
+
+                        popup = (
+                            "Janela",
+                            "Adoro escrever e desenhar"
+                        )
+
+                    else:
+
+                        window_done = True
+
+                        popup = (
+                            "Janela",
+                            "Ainda me lembro de quando pintei\n"
+                            "um quadro olhando para essa vista."
+                        )
+
+                elif items["painting"]["rect"].collidepoint(mx, my):
+
+                    if not window_done:
+
+                        popup = (
+                            "Quadro",
+                            "Que vista linda!"
+                        )
+
+                    else:
+
+                        if painting_done:
+
+                            popup = (
+                                "Quadro",
+                                "A pintura já foi restaurada."
+                            )
+
+                        else:
+
+                            game_state = STATE_PAINTING
+                            painting_selected = None
+
+                elif items["clock"]["rect"].collidepoint(mx, my):
+
+                    if alarm_on:
+
+                        stop_alarm()
+                        clock_done = True
+
+                        popup = (
+                            "Relógio",
+                            "Você não acha que está na hora de dormir?"
+                        )
+
+                    else:
+
+                        if not painting_done:
+
+                            popup = (
+                                "Relógio",
+                                "Uma pintura demora muito para ser feita"
+                            )
+
+                        else:
+
+                            clock_done = True
+
+                            popup = (
+                                "Relógio",
+                                "Você não acha que está na hora de dormir?"
+                            )
+
+                elif items["bed"]["rect"].collidepoint(mx, my):
+
+                    if not clock_done:
+
+                        popup = (
+                            "Cama",
+                            "Que horas são?"
+                        )
+
+                    else:
+
+                        if not bed_done:
+
+                            start_bed_puzzle()
+
+                        else:
+
+                            popup = (
+                                "Senha da cama",
+                                f"A senha do cofre é:\n{code}"
+                            )
+
+                elif items["safe"]["rect"].collidepoint(mx, my):
+
+                    if not bed_done:
+
+                        popup = (
+                            "Cofre",
+                            "Você precisa da senha."
+                        )
+
+                    else:
+
+                        safe_active = True
