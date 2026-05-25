@@ -239,3 +239,55 @@ items = {
     "clock": {"rect": pygame.Rect(375, 350, 60, 55)},
     "painting": {"rect": pygame.Rect(130, 150, 80, 130)},
 }
+
+# ---------------------------------------------------
+# POEMA
+# ---------------------------------------------------
+poem_lines = [
+    "Acorda com o som da chuva a cair,",
+    "Lentes nos olhos pra melhor refletir,",
+    "O dia cinza se torna mais claro,",
+    "Por trás dos óculos, tudo é raro.",
+]
+
+# ---------------------------------------------------
+# PUZZLE DA CAMA
+# ---------------------------------------------------
+x = y = a = b = z = w = 0
+questions = []
+current_question = 0
+user_input = ""
+puzzle_active = False
+
+safe_active = False
+safe_input = ""
+
+code = ""
+
+BED_TIME_LIMIT = 20.0
+bed_timer_remaining = BED_TIME_LIMIT
+
+def generate_bed_puzzle():
+    global x, y, a, b, z, w, questions, code
+
+    x = random.randint(1, 9)
+    y = random.randint(1, 9)
+
+    a = random.randint(100, 999)
+    b = random.randint(1, 99)
+    while a % b!= 0:
+        b = random.randint(1, 99)
+
+    z = random.randint(0, 999)
+    w = random.randint(0, 999)
+
+    questions = [
+        (f"{x} x {y} =", f"{x * y}"),
+        (f"{a} / {b} =", f"{a // b}"),
+        (f"{z} + {w} =", f"{z + w}"),
+    ]
+
+    code = f"{x * y}{a // b}{z + w}"
+
+
+generate_bed_puzzle()
