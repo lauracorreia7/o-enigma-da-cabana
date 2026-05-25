@@ -365,3 +365,62 @@ def draw_popup(title, text):
 
     hint = font_small.render("Clique para fechar", True, (180, 180, 180))
     screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 45))
+
+# ---------------------------------------------------
+# PUZZLE SCREEN
+# ---------------------------------------------------
+def draw_puzzle():
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 210))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(W // 2 - 350, H // 2 - 220, 700, 440)
+
+    pygame.draw.rect(screen, (30, 30, 30), box, border_radius=15)
+    pygame.draw.rect(screen, GOLD, box, 3, border_radius=15)
+
+    draw_text_center("Arrume a cama!", font_big, GOLD, box.centerx, box.y + 50)
+
+    remaining = max(0.0, bed_timer_remaining)
+    timer_color = RED if remaining <= 5 else GOLD
+    draw_text_center(f"Tempo: {int(remaining)}s", font_small, timer_color, box.right - 70, box.y + 28)
+
+    q = questions[current_question][0]
+    draw_text_center(q, font_big, WHITE, box.centerx, box.y + 170)
+
+    input_box = pygame.Rect(box.centerx - 150, box.y + 240, 300, 70)
+
+    pygame.draw.rect(screen, (50, 50, 50), input_box, border_radius=8)
+    pygame.draw.rect(screen, GOLD, input_box, 2, border_radius=8)
+
+    display = user_input if user_input else "_"
+    draw_text_center(display, font_big, WHITE, input_box.centerx, input_box.centery)
+
+# ---------------------------------------------------
+# SAFE SCREEN
+# ---------------------------------------------------
+def draw_safe():
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 210))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(W // 2 - 300, H // 2 - 200, 600, 400)
+
+    pygame.draw.rect(screen, (30, 30, 30), box, border_radius=15)
+    pygame.draw.rect(screen, GOLD, box, 3, border_radius=15)
+
+    draw_text_center("COFRE", font_big, GOLD, box.centerx, box.y + 50)
+
+    input_box = pygame.Rect(box.centerx - 150, box.y + 170, 300, 80)
+
+    pygame.draw.rect(screen, (50, 50, 50), input_box, border_radius=10)
+    pygame.draw.rect(screen, GOLD, input_box, 2, border_radius=10)
+
+    hidden = "•" * len(safe_input)
+    display = hidden if hidden else "_"
+    draw_text_center(display, font_big, WHITE, input_box.centerx, input_box.centery)
+
+    draw_text_center("Digite a senha e pressione ENTER", font, WHITE, box.centerx, box.y + 320)
+
+    hint = font_small.render("ESC para voltar ao quarto", True, (170, 160, 145))
+    screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 32))
