@@ -151,7 +151,7 @@ def _sorted_piece_names(names):
     def key_fn(name):
         stem = Path(name).stem
         nums = []
-        for part in stem.replace("-", "").split(""):
+        for part in stem.replace("-", "").split(" "):
             if part.isdigit():
                 nums.append(int(part))
         return nums if nums else [9999, stem]
@@ -1205,3 +1205,130 @@ while running:
                     else:
 
                         safe_active = True
+
+        # ---------------------------------------------------
+        # TECLADO FASE 1
+        # ---------------------------------------------------
+
+        if event.type == pygame.KEYDOWN:
+
+            if safe_active and event.key == pygame.K_ESCAPE:
+                safe_active = False
+                continue
+
+            if puzzle_active:
+
+                if event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+
+                elif event.key == pygame.K_RETURN:
+
+                    if user_input == questions[current_question][1]:
+
+                        current_question += 1
+                        user_input = ""
+
+                        if current_question >= len(questions):
+
+                            puzzle_active = False
+                            bed_done = True
+
+                            popup = (
+                                "Senha Encontrada",
+                                f"A senha do cofre é:\n{code}"
+                            )
+
+                    else:
+                        user_input = ""
+
+                elif event.unicode.isdigit():
+                    user_input += event.unicode
+
+            elif safe_active:
+
+                if event.key == pygame.K_BACKSPACE:
+                    safe_input = safe_input[:-1]
+
+                elif event.key == pygame.K_RETURN:
+
+                    if safe_input == code:
+
+                        safe_done = True
+                        safe_active = False
+                        game_state = STATE_VICTORY
+
+                    else:
+
+                        safe_input = ""
+
+                        popup = (
+                            "Erro",
+                            "Senha incorreta."
+                        )
+
+                elif event.unicode.isdigit():
+                    safe_input += event.unicode
+
+    # ---------------------------------------------------
+    # DRAW FASE 2
+    # ---------------------------------------------------
+
+    if phase2_started:
+
+        if state == STATE_INTRO_1:
+            draw_intro()
+
+        elif state == STATE_INTRO_2:
+            draw_intro_burning()
+
+        elif state == STATE_SCENE:
+            draw_scene()
+
+        elif state == STATE_MEMORY:
+            draw_memory()
+
+        elif state == STATE_WIN:
+            draw_win()
+
+    # ---------------------------------------------------
+    # DRAW FASE 1
+    # ---------------------------------------------------
+
+    else:
+
+        if game_state == STATE_START:
+            draw_start()
+
+        elif game_state == STATE_POEM:
+            draw_poem()
+
+        elif game_state == STATE_PAINTING:
+            draw_painting_puzzle()
+
+        elif game_state == STATE_GAME:
+
+            draw_game1()
+
+            if popup:
+                draw_popup(popup[0], popup[1])
+
+            if puzzle_active:
+                draw_puzzle()
+
+            if safe_active:
+                draw_safe()
+
+        elif game_state == STATE_VICTORY:
+            draw_victory()
+
+        elif game_state == STATE_LOSE:
+            draw_lose()
+
+        elif game_state == STATE_NEXT:
+            draw_next()
+
+    pygame.display.flip()
+
+stop_alarm()
+pygame.quit()
+sys.exit()
