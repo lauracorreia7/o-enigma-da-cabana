@@ -479,3 +479,34 @@ def draw_victory():
     pygame.draw.rect(screen, (35, 30, 24), next_button, border_radius=12)
     pygame.draw.rect(screen, GOLD, next_button, 3, border_radius=12)
     draw_text_center("PROXIMA FASE", font, GOLD, next_button.centerx, next_button.centery)
+
+# ---------------------------------------------------
+# TELA DE DERROTA
+# ---------------------------------------------------
+def draw_lose():
+    screen.blit(background, (0, 0))
+
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 200))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(180, 110, 640, 420)
+
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=20)
+    pygame.draw.rect(screen, RED, box, 4, border_radius=20)
+
+    draw_text_center("VOCÊ PERDEU", font_big, RED, box.centerx, box.y + 60)
+    draw_text_center("O tempo acabou.", font, WHITE, box.centerx, box.y + 150)
+    draw_text_center("A cabana engoliu sua chance.", font, WHITE, box.centerx, box.y + 195)
+
+    pygame.draw.rect(screen, (35, 30, 24), lose_button, border_radius=12)
+    pygame.draw.rect(screen, RED, lose_button, 3, border_radius=12)
+    draw_text_center("TENTAR NOVAMENTE", font, RED, lose_button.centerx, lose_button.centery)
+
+# ---------------------------------------------------
+# PROXIMA FASE
+# ---------------------------------------------------
+def draw_next():
+    screen.fill((10, 10, 14))
+    draw_text_center("Fase 2", font_big, GOLD, W // 2, 220)
+    draw_text_center("A cozinha", font, WHITE, W // 2, 320)
