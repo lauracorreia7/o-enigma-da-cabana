@@ -29,13 +29,19 @@ BLACK = (0, 0, 0)
 GOLD = (255, 220, 120)
 GREEN = (80, 220, 120)
 RED = (220, 70, 70)
+YELLOW = (240, 210, 90)
+GRAY = (130, 130, 130)
+PAPER = (245, 239, 225)
 
 # ---------------------------------------------------
-# FONTS
+# FONTES
 # ---------------------------------------------------
-font = pygame.font.SysFont("arial", 28)
-font_big = pygame.font.SysFont("arial", 42, bold=True)
+
 font_small = pygame.font.SysFont("arial", 18)
+font = pygame.font.SysFont("arial", 24)
+font_mid = pygame.font.SysFont("arial", 28)
+font_big = pygame.font.SysFont("arial", 42, bold=True)
+font_huge = pygame.font.SysFont("arial", 58, bold=True)
 
 # ---------------------------------------------------
 # IMAGENS
@@ -44,6 +50,7 @@ ASSET_DIR = Path("cenarios")
 BACKGROUND_PATH = ASSET_DIR / "quarto.png"
 BACKGROUND_POEM_PATH = ASSET_DIR / "quarto_papel.png"
 START_PATH = ASSET_DIR / "inicio.png"
+BACKGROUND_PATH_COZINHA = ASSET_DIR / "cozinha.png"
 
 ASSET_DIR_SONS = Path("sons")
 
@@ -55,6 +62,9 @@ background_poem = pygame.transform.scale(background_poem, (W, H))
 
 start_bg = pygame.image.load(str(START_PATH)).convert()
 start_bg = pygame.transform.scale(start_bg, (W, H))
+
+background_cozinha = pygame.image.load(str(BACKGROUND_PATH_COZINHA)).convert()
+background_cozinha = pygame.transform.scale(background_cozinha, (W, H))
 
 # ---------------------------------------------------
 # SOM DO ALARME
