@@ -586,7 +586,7 @@ def draw_game2():
 # ---------------------------------------------------
 def draw_start():
     screen.blit(start_bg, (0, 0))
-    
+
 def draw_intro():
     screen.blit(background_cozinha, (0, 0))
     draw_intro_panel("Fase 2", "A cozinha")
@@ -620,6 +620,201 @@ def start_bed_puzzle():
     user_input = ""
     bed_timer_remaining = BED_TIME_LIMIT
 
+# ---------------------------------------------------
+# MEMÓRIA
+# ---------------------------------------------------
+
+creatures = ["Vampiro", "Fantasma", "Múmia", "Lobisomem"]
+deck = creatures * 2
+random.shuffle(deck)
+
+memory_cards = []
+start_x = 72
+start_y = 180
+card_w = 200
+card_h = 200
+gap_x = 20
+gap_y = 20
+
+idx = 0
+for row in range(2):
+    for col in range(4):
+        rect = pygame.Rect(
+            start_x + col * (card_w + gap_x),
+            start_y + row * (card_h + gap_y),
+            card_w,
+            card_h,
+        )
+        memory_cards.append({
+            "rect": rect,
+            "name": deck[idx],
+            "revealed": False,
+            "matched": False,
+        })
+        idx += 1
+
+memory_first = None
+memory_second = None
+memory_flip_timer = 0
+memory_mismatch = False
+
+def complete_memory():
+    global memory_complete, step, state, popup_text
+    memory_complete = True
+    step = 1
+    state = STATE_SCENE
+    popup_text = "Ufa, você apagou o fogo \n e nem teve que usar água."
+
+def handle_memory_click(pos):
+    global memory_first, memory_second, memory_flip_timer, memory_mismatch
+
+    if memory_flip_timer > 0:
+        return
+
+    for card in memory_cards:
+        if card["rect"].collidepoint(pos) and not card["matched"] and not card["revealed"]:
+            card["revealed"] = True
+
+            if memory_first is None:
+                memory_first = card
+
+            elif memory_second is None and card is not memory_first:
+                memory_second = card
+
+                if memory_first["name"] == memory_second["name"]:
+                    memory_first["matched"] = True
+                    memory_second["matched"] = True
+                    memory_first = None
+                    memory_second = None
+
+                    if all(c["matched"] for c in memory_cards):
+                        complete_memory()
+                else:
+                    memory_flip_timer = 45
+                    memory_mismatch = True
+            break
+
+def draw_memory():
+    screen.fill((40, 40, 40))
+
+    panel = pygame.Rect(40, 55, 920, 580)
+    pygame.draw.rect(screen, (238, 235, 228), panel, border_radius=20)
+    pygame.draw.rect(screen, (70, 70, 70), panel, 3, border_radius=20)
+
+    draw_text("Jogo da Memória", font_huge, BLACK, panel.x + 40, panel.y + 18)
+    draw_text("Ache os pares para apagar o fogo.", font, BLACK, panel.x + 45, panel.y + 78)
+
+    for card in memory_cards:
+        if card["matched"]:
+            color = GREEN
+            label = card["name"]
+        elif card["revealed"]:
+            color = YELLOW
+            label = card["name"]
+        else:
+            color = GRAY
+            label = "?"
+
+        pygame.draw.rect(screen, color, card["rect"], border_radius=12)
+        pygame.draw.rect(screen, BLACK, card["rect"], 2, border_radius=12)
+        txt = font.render(label, True, BLACK)
+        screen.blit(txt, txt.get_rect(center=card["rect"].center))
+
+# ---------------------------------------------------
+# PROGRESSO / FASE 2
+# ---------------------------------------------------
+
+step = 0
+book_open = False
+memory_complete = False
+win_ready = False
+phase2_started = False
+popup_text = None
+
+# ---------------------------------------------------
+# LIVRO DE RECEITAS
+# ---------------------------------------------------
+def draw_scene():
+    screen.blit(background_cozinha, (0, 0))
+
+    if book_open:
+        page = pygame.Rect(330, 150, 350, 360)
+        pygame.draw.rect(screen, PAPER, page, border_radius=14)
+        pygame.draw.rect(screen, (140, 120, 90), page, 3, border_radius=14)
+
+        draw_text_center("Receita", font_big, BLACK, page.centerx, page.y + 34)
+
+        lines = [
+            "- 2 xícaras de farinha",
+            "- 1 xícara de açúcar",
+            "- 3 ovos",
+            "- 1 colher de fermento",
+            "- Misture até ficar homogêneo",
+        ]
+        y2 = page.y + 86
+        for line in lines:
+            draw_text(line, font, BLACK, page.x + 24, y2)
+            y2 += 40
+
+        warning = font_mid.render("USE A COLHER DE PAU!", True, RED)
+        screen.blit(warning, warning.get_rect(center=(page.centerx, page.bottom - 42)))
+
+    if popup_text is not None:
+        draw_popup("Cozinha", popup_text)
+
+#----------------------------------
+# FASE 2
+#----------------------------------
+def handle_scene_click(pos):
+    global state, step, book_open, win_ready, popup_text
+
+    if step == 0 and hotspots["stove"].collidepoint(pos):
+        state = STATE_MEMORY
+        return
+
+    if book_open:
+        book_open = False
+        return
+
+    if step == 1 and hotspots["faucet"].collidepoint(pos):
+        popup_text = "A receita que fiz sujou muita louça."
+        step = 2
+        return
+
+    if step == 2 and hotspots["book"].collidepoint(pos):
+        book_open = True
+        step = 3
+        return
+
+    if step == 3 and hotspots["spoon"].collidepoint(pos):
+        popup_text = "Usei a mesma madeira na \n colher e no armário."
+        step = 4
+        return
+
+    if step == 4 and hotspots["cabinet"].collidepoint(pos):
+        popup_text = "Costumava deixar os pratos guardados \n aqui, até que..."
+        step = 5
+        return
+
+    if step == 5 and hotspots["plates"].collidepoint(pos):
+        popup_text = "O tapete ajudou os pratos \n a não quebrarem tanto."
+        step = 6
+        return
+
+    if step == 6 and hotspots["rug"].collidepoint(pos):
+        popup_text = "Quanta sujeira, acho que deixei \n algum tempero cair enquanto cozinhava."
+        step = 7
+        return
+
+    if step == 7 and hotspots["spices"].collidepoint(pos):
+        popup_text = "Se essa luz não estivesse tão ruim, \n eu não teria confundido os temperos."
+        step = 8
+        return
+
+    if step == 8 and hotspots["light"].collidepoint(pos):
+        win_ready = True
+        state = STATE_WIN
+        return
 
 # ---------------------------------------------------
 # MAIN LOOP
