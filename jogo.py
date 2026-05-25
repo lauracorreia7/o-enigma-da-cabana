@@ -218,6 +218,13 @@ STATE_VICTORY = "victory"
 STATE_LOSE = "lose"
 STATE_NEXT = "next"
 
+
+STATE_INTRO_1 = "intro_1"
+STATE_INTRO_2 = "intro_2"
+STATE_SCENE = "scene"
+STATE_MEMORY = "memory"
+STATE_WIN = "win"
+
 game_state = STATE_START
 
 glasses_done = False
@@ -236,6 +243,7 @@ popup = None
 start_button = pygame.Rect(385, 520, 235, 70)
 next_button = pygame.Rect(350, 520, 300, 70)
 lose_button = pygame.Rect(350, 520, 300, 70)
+exit_button = pygame.Rect(385, 540, 230, 60)
 
 # ---------------------------------------------------
 # BOTÕES DOS ITENS
@@ -247,9 +255,17 @@ items = {
     "bed": {"rect": pygame.Rect(100, 300, 250, 250)},
     "safe": {"rect": pygame.Rect(830, 360, 140, 140)},
     "clock": {"rect": pygame.Rect(375, 350, 60, 55)},
-    "painting": {"rect": pygame.Rect(130, 150, 80, 130)},
-}
-
+    "painting": {"rect": pygame.Rect(130, 150, 80, 130)},}
+hotspots = {
+    "stove": pygame.Rect(20, 370, 250, 250),
+    "faucet": pygame.Rect(650, 270, 50, 80),
+    "book": pygame.Rect(260, 250, 150, 100),
+    "spoon": pygame.Rect(400, 230, 60, 100),
+    "cabinet": pygame.Rect(800, 400, 100, 200),
+    "plates": pygame.Rect(570, 60, 150, 70),
+    "rug": pygame.Rect(290, 520, 420, 140),
+    "spices": pygame.Rect(790, 240, 100, 110),
+    "light": pygame.Rect(500, 5, 50, 70),}
 # ---------------------------------------------------
 # POEMA
 # ---------------------------------------------------
@@ -314,6 +330,42 @@ def draw_text_center(text, font_obj, color, centerx, centery):
     img = font_obj.render(text, True, color)
     screen.blit(img, (centerx - img.get_width() // 2, centery - img.get_height() // 2))
 
+def draw_intro_panel(title, subtitle):
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 145))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(200, 150, 600, 360)
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=12)
+    pygame.draw.rect(screen, GOLD, box, 3, border_radius=12)
+
+    draw_text_center(title, font_big, GOLD, box.centerx, box.y + 90)
+    draw_text_center(subtitle, font_huge, WHITE, box.centerx, box.y + 165)
+    draw_text_center("clique para continuar", font, WHITE, box.centerx, box.bottom - 42)
+
+def draw_popup(title, text):
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(200, 150, 600, 360)
+
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=12)
+    pygame.draw.rect(screen, GOLD, box, 3, border_radius=12)
+
+    draw_text_center(title, font_big, GOLD, box.centerx, box.y + 60)
+
+    lines = text.split("\n")
+    yy = box.y + 135
+
+    for line in lines:
+        img = font_mid.render(line, True, WHITE)
+        screen.blit(img, (box.centerx - img.get_width() // 2, yy))
+        yy += 40
+
+    hint = font_small.render("Clique para fechar", True, (180, 180, 180))
+    screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 45))
+
 # ---------------------------------------------------
 # RESET
 # ---------------------------------------------------
@@ -349,32 +401,6 @@ def reset_game():
     bed_timer_remaining = BED_TIME_LIMIT
     generate_bed_puzzle()
     stop_alarm()
-
-# ---------------------------------------------------
-# POPUP
-# ---------------------------------------------------
-def draw_popup(title, text):
-    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 180))
-    screen.blit(overlay, (0, 0))
-
-    box = pygame.Rect(200, 150, 600, 360)
-
-    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=12)
-    pygame.draw.rect(screen, GOLD, box, 3, border_radius=12)
-
-    draw_text_center(title, font_big, GOLD, box.centerx, box.y + 60)
-
-    lines = text.split("\n")
-    yy = box.y + 135
-
-    for line in lines:
-        img = font.render(line, True, WHITE)
-        screen.blit(img, (box.centerx - img.get_width() // 2, yy))
-        yy += 40
-
-    hint = font_small.render("Clique para fechar", True, (180, 180, 180))
-    screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 45))
 
 # ---------------------------------------------------
 # PUZZLE SCREEN
@@ -490,6 +516,31 @@ def draw_victory():
     pygame.draw.rect(screen, GOLD, next_button, 3, border_radius=12)
     draw_text_center("PROXIMA FASE", font, GOLD, next_button.centerx, next_button.centery)
 
+def draw_win():
+    screen.blit(background_cozinha, (0, 0))
+    overlay = pygame.Surface((W, H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 170))
+    screen.blit(overlay, (0, 0))
+
+    box = pygame.Rect(180, 90, 640, 500)
+    pygame.draw.rect(screen, (20, 20, 20), box, border_radius=20)
+    pygame.draw.rect(screen, GOLD, box, 4, border_radius=20)
+
+    draw_text_center("Parabéns, você escapou!", font_big, GOLD, box.centerx, box.y + 60)
+
+    cx = box.centerx
+    cy = box.centery 
+
+    pygame.draw.circle(screen, GOLD, (cx - 120, cy), 38, 8)
+    pygame.draw.rect(screen, GOLD, (cx - 80, cy - 10, 220, 20))
+    pygame.draw.rect(screen, GOLD, (cx + 90, cy + 10, 20, 40))
+    pygame.draw.rect(screen, GOLD, (cx + 130, cy + 10, 20, 25))
+    pygame.draw.line(screen, (255, 245, 180), (cx - 75, cy), (cx + 120, cy), 3)
+
+    pygame.draw.rect(screen, (35, 30, 24), exit_button, border_radius=12)
+    pygame.draw.rect(screen, GOLD, exit_button, 3, border_radius=12)
+    draw_text_center("SAIR", font, GOLD, exit_button.centerx, exit_button.centery)
+
 # ---------------------------------------------------
 # TELA DE DERROTA
 # ---------------------------------------------------
@@ -516,22 +567,33 @@ def draw_lose():
 # ---------------------------------------------------
 # PROXIMA FASE
 # ---------------------------------------------------
+
 def draw_next():
-    screen.fill((10, 10, 14))
-    draw_text_center("Fase 2", font_big, GOLD, W // 2, 220)
-    draw_text_center("A cozinha", font, WHITE, W // 2, 320)
+    game_state = STATE_INTRO_1
 
 # ---------------------------------------------------
 # GAME
 # ---------------------------------------------------
-def draw_game():
+
+def draw_game1():
     screen.blit(background, (0, 0))
+
+def draw_game2():
+    screen.blit(background_cozinha, (0,0))
 
 # ---------------------------------------------------
 # START SCREEN
 # ---------------------------------------------------
 def draw_start():
     screen.blit(start_bg, (0, 0))
+    
+def draw_intro():
+    screen.blit(background_cozinha, (0, 0))
+    draw_intro_panel("Fase 2", "A cozinha")
+
+def draw_intro_burning():
+    screen.blit(background_cozinha, (0, 0))
+    draw_popup("A cozinha", "Você está sentindo esse cheiro?\nAcho que algo está queimando...")
 
 # ---------------------------------------------------
 # POEM SCREEN
