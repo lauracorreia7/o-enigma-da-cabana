@@ -510,3 +510,30 @@ def draw_next():
     screen.fill((10, 10, 14))
     draw_text_center("Fase 2", font_big, GOLD, W // 2, 220)
     draw_text_center("A cozinha", font, WHITE, W // 2, 320)
+
+# ---------------------------------------------------
+# GAME
+# ---------------------------------------------------
+def draw_game():
+    screen.blit(background, (0, 0))
+
+# ---------------------------------------------------
+# START SCREEN
+# ---------------------------------------------------
+def draw_start():
+    screen.blit(start_bg, (0, 0))
+
+# ---------------------------------------------------
+# POEM SCREEN
+# ---------------------------------------------------
+def draw_poem():
+    screen.blit(background_poem, (0, 0))
+
+    y = 220
+    for line in poem_lines:
+        text = font.render(line, True, (40, 30, 22))
+        screen.blit(text, (305, y))
+        y += 55
+
+    hint = font_small.render("Clique ou pressione ENTER para continuar", True, (60, 60, 50))
+    screen.blit(hint, (350, 520))
